@@ -10,4 +10,8 @@ Principe :
 
 Les capteurs remontent la température au Raspberry.
 
+DFRobot :
+
+Attention : Brancher sur NO pour avoir l'amperage max (16A).
+
 
