@@ -10,7 +10,7 @@ local hysteresis = 0.5 --Valeur seuil pour éviter que le relai ne cesse de comm
 local sonde = 'Salon' --Nom de la sonde de température
 local thermostat = 'Thermostat salon' --Nom de l'interrupteur virtuel du thermostat
 local radiateur = 'Radiateur salon' --Nom du radiateur à allumer/éteindre
---------------------------------
+——————————————
 -- Fin des variables à éditer --
 --------------------------------
 
