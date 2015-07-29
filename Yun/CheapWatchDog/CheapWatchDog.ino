@@ -17,7 +17,7 @@ volatile int state = LOW; // heart beat state
 
 unsigned long lastHeartbeat = 0;
 
-void(* reboot) (void) = 0; //declare reset function @ address 0
+//void(* reboot) (void) = 0; //declare reset function @ address 0
 
 void setup() {  
   boot();
@@ -45,7 +45,8 @@ void sendReset() {
   digitalWrite(RESET_PIN, HIGH);
   
   // Wait Main arduino to reboot
-  reboot();
+  //reboot();
+  boot();
 }
 
 void boot(){
