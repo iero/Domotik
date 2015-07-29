@@ -1,52 +1,56 @@
+/* 
+  iero Cheap WatchDog
+     Written by G. FABRE July 2015
+     Website: https://github.com/iero
+     Wait for heartbeat from Arduino and send reset 
+       if it doesn't catch any life sign.
+*/
 
 #define LED_PIN 13 // White led
 #define PULSE_PIN 11 // Get Heartbeat
 #define RESET_PIN 9 // Port to send reset
 
-#define WATCHDOG_DELAY 10000 // Wait 10s before sending reset
+#define WATCHDOG_DELAY 300000 // Wait 5 min before sending reset
 #define ARDUINO_REBOOT_TIME 60000 // Wait 1 min for master Arduino to restart
 
+volatile int state = LOW; // heart beat state
+
 unsigned long lastHeartbeat = 0;
-unsigned long lastUptimeReport = 0;
+
+void(* reboot) (void) = 0; //declare reset function @ address 0
 
 void setup() {  
-  digitalWrite(LED_PIN, HIGH);
-  delay(ARDUINO_REBOOT_TIME);
-  lastHeartbeat = millis();
-  digitalWrite(LED_PIN, LOW);
+  boot();
 }
 
 void loop() {
   // Get last pulse
   boolean pulse = digitalRead(PULSE_PIN);
 
-  if (pulse == HIGH) { // Got pulse
-    digitalWrite(LED_PIN, HIGH);
+  if (pulse != state) { // Got pulse change
     lastHeartbeat = millis();
-    delay(1000);
-    digitalWrite(LED_PIN, LOW);
-    delay(1000);
+    state = pulse ;
   }
 
   unsigned long uptime = millis();
-  if ((uptime - lastHeartbeat) >= WATCHDOG_DELAY) { //too long
-    //Serial.println("Uptime: " + String((uptime - (uptime % 5000)) / 1000) + " seconds (" + String((uptime - lastHeartbeat) / 1000) + " seconds since last heartbeat)");
+  if ((uptime - lastHeartbeat) >= WATCHDOG_DELAY) {
     sendReset();
   }
-  //delay(200); // needed for prod ?
 }
 
 void sendReset() {
   // Send reset to main Arduino by sending LOW
-  //Serial.println("Reset.. and wait");
-  digitalWrite(LED_PIN, HIGH);
   digitalWrite(RESET_PIN, LOW);
   delay(1000);
   digitalWrite(RESET_PIN, HIGH);
+  
   // Wait Main arduino to reboot
+  reboot();
+}
+
+void boot(){
+  digitalWrite(LED_PIN, HIGH);
   delay(ARDUINO_REBOOT_TIME);
-  digitalWrite(LED_PIN, LOW);
-  delay(5000);
   lastHeartbeat = millis();
-  //Serial.println("Back on line ?");
+  digitalWrite(LED_PIN, LOW);
 }
