@@ -23,17 +23,27 @@ if (devicechanged[thermostat] == 'On' or (devicechanged[sondeTemp] and otherdevi
 	
 	--commandArray['SendNotification']='Thermostat#Theoomstat checked#0'
 	-- Get temperatures
+<<<<<<< HEAD
 	salonTemp, salonHumidity, salonFeelsLike, salonPressure = otherdevices_svalues[sondeTemp]:match("([^;]+);([^;]+);([^;]+);([^;]+);([^;]+)")
 	local temperature = tonumber(salonTemp)
 	local tempTarget = uservariables[thTarget]
 
 	print('[Salon] Actual temperature of ' .. temperature .. ' with objective of ' .. tempTarget)
+=======
+	local temperature = tonumber(otherdevices_svalues[sondeTemp])
+	local tempTarget = uservariables[thTarget]
+
+	print('Temperature/Target : ' .. temperature .. '/' .. tempTarget)
+>>>>>>> origin/master
 
 	-- Check radiator state
 	radiateur1State = otherdevices[radiateur1]
 	radiateur2State = otherdevices[radiateur2]
 	radiateur3State = otherdevices[radiateur3]
+<<<<<<< HEAD
 	print('[Salon] Actual temperature : ' .. temperature .. '. Target : ' .. tempTarget.. ' ('..radiateur1State..')')
+=======
+>>>>>>> origin/master
 
 	-- Thermostat on
 	if (temperature < (tempTarget - hysteresis)) then
@@ -66,11 +76,15 @@ if (devicechanged[thermostat] == 'On' or (devicechanged[sondeTemp] and otherdevi
 end
 
 if (devicechanged[thermostat] == 'Off') then
+<<<<<<< HEAD
 	print('[Salon] Thermostat OFF')
+=======
+>>>>>>> origin/master
 	radiateur1State = otherdevices[radiateur1]
         radiateur2State = otherdevices[radiateur2]
         radiateur3State = otherdevices[radiateur3]
 
+<<<<<<< HEAD
         --if (radiateurState1 == 'On') then
                 commandArray[radiateur1]='Off'
         --end
@@ -80,6 +94,17 @@ if (devicechanged[thermostat] == 'Off') then
         --if (radiateurState3 == 'On') then
 		commandArray[radiateur3]='Off'
 	--end
+=======
+        if (radiateurState1 == 'On') then
+                commandArray[radiateur1]='Off'
+        end
+        if (radiateurState2 == 'On') then
+		commandArray[radiateur2]='Off'
+        end
+        if (radiateurState3 == 'On') then
+		commandArray[radiateur3]='Off'
+        end
+>>>>>>> origin/master
 end
 
 return commandArray
