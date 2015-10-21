@@ -2,55 +2,50 @@
 -- Thermostat Chambre
 
 -- Variables
-local hysteresis = 0.5 -- Plus ou moins 1/2 deg
+local hysteresis = 0.1
 
--- Sonde temperature
-local tempInt = 'Module'
---local tempMaxAprem = ''
+-- Temperature
+local thSonde = 'Module'
+local thTarget = 'Temp_Chambre_Nuit'
 
 -- Thermostat
+local modechauffage = 'Chauffages'
 local thermostat = 'Thermostat Chambre Parents' 
-local radiateurs = 'Chambre Parents'
+local radiateur = 'Chambre Parents'
+
+-- Variables gestion montee en temperature
 
 commandArray = {}
 
--- time = os.date("*t")
-
---if (devicechanged['MyDeviceName'] == 'On' and otherdevices['MyOtherDeviceName'] == 'Off' and time.hour >= 22)
--- then
---    commandArray['MyOtherDeviceName']='On'
--- end
-
---if (devicechanged[tempInt]) then
-if (tempInt < 18) then
+if (otherdevices[modechauffage] and (devicechanged[thermostat] == 'On' or (devicechanged[thSonde] and otherdevices[thermostat] == 'On'))) then
 	
-	print('Temperature changed')
-	print(tempInt)
+	--commandArray['SendNotification']='Thermostat#Theoomstat checked#0'
 	-- Get temperatures
+	chTemp, chHumidity = otherdevices_svalues[thSonde]:match("([^;]+);([^;]+)")
 
-	local tempNuit = otherdevices_svalues['Thermostat Chambre Nuit']
-	local tempJour = otherdevices_svalues['Thermostat Absence']
+        local temperature = tonumber(chTemp)
+	local tempTarget = uservariables[thTarget]
+	--local tempJour = otherdevices_svalues['Thermostat Absence']
 
-	local temperature = devicechanged[string.format('%s_Temperature', tempInt)]
+	-- Check radiator state
+	radiateurState = otherdevices[radiateur]
+	print('[Chambre] Actual temperature : ' .. temperature .. '. Target : ' .. tempTarget.. ' ('..radiateurState..')')
 
 	-- Thermostat on
-	if (otherdevices[thermostat]=='On') then
-		if (temperature < (consigne - hysteresis) ) then
-			print('Thermostat salon : On')
-			commandArray[radiateurs]='Off'
-		elseif (temperature > (consigne + hysteresis)) then
-			print('Thermostat salon : Off')
-			commandArray[radiateurs]='On'
-		end
+	if (temperature < (tempTarget - hysteresis) and radiateurState == 'Off') then
+		print(thermostat..' switched ON')
+		commandArray[radiateur]='On'
+	elseif (temperature > (tempTarget + hysteresis) and radiateurState == 'On') then
+		print(thermostat..' switched OFF')
+		commandArray[radiateur]='Off'
 	end
 end
 
-return commandArray
- (tempNuit + hysteresis) and radiateurState == 'On') then
-			print(thermostat..' : Off')
-			commandArray[radiateur]='Off'
-		end
-	end
+if (devicechanged[thermostat] == 'Off') then
+	radiateurState = otherdevices[radiateur]
+        --if (radiateurState == 'On') then
+                commandArray[radiateur]='Off'
+        --end
 end
 
 return commandArray
